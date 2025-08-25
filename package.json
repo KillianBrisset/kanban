@@ -1,0 +1,19 @@
+{
+	"name": "@killianbrisset/kanban-monorepo",
+	"private": true,
+	"packageManager": "pnpm@10.15.0",
+	"scripts": {
+		"build": "pnpm -r --filter ./packages/** run build",
+		"lint": "eslint . --ext .ts,.tsx || true",
+		"test": "vitest run",
+		"changeset": "changeset",
+		"release": "pnpm -w build && changeset publish",
+		"sync:license": "cp LICENSE packages/core/LICENSE && cp LICENSE packages/react/LICENSE"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.29.6",
+		"eslint": "^9.33.0",
+		"typescript": "^5.9.2",
+		"vitest": "^3.2.4"
+	}
+}

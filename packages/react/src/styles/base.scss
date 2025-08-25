@@ -1,0 +1,431 @@
+/* =========================================================
+   Kanban Base Styles (SCSS)
+   - Zero Tailwind, zero external CSS deps
+   - Theming via CSS variables (light/dark)
+   - Clean layout for board / column / card
+   - Small utilities + accessibility focus
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1) THEME VARIABLES
+   --------------------------------------------------------- */
+
+/* Light theme (default) */
+:root {
+	/* Palette */
+	--kb-bg: #ffffff;
+	--kb-fg: #1f2937; /* gray-800 */
+	--kb-muted-fg: #6b7280; /* gray-500 */
+	--kb-border: #e5e7eb; /* gray-200 */
+
+	/* Surface / Elevation */
+	--kb-surface: #ffffff;
+	--kb-surface-2: #f9fafb; /* subtle contrast for headers/sections */
+	--kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+	--kb-shadow-md: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+	/* Accents (semantic) */
+	--kb-primary: #2563eb; /* blue-600 */
+	--kb-success: #16a34a; /* green-600 */
+	--kb-warning: #d97706; /* amber-600 */
+	--kb-danger: #dc2626; /* red-600 */
+	--kb-info: #0ea5e9; /* sky-500 */
+
+	/* Spacing scale */
+	--kb-space-2xs: 0.125rem; /* 2px */
+	--kb-space-xs: 0.25rem; /* 4px */
+	--kb-space-sm: 0.5rem; /* 8px */
+	--kb-space-md: 1rem; /* 16px */
+	--kb-space-lg: 1.5rem; /* 24px */
+	--kb-space-xl: 2rem; /* 32px */
+
+	/* Radius */
+	--kb-radius-sm: 0.375rem; /* 6px */
+	--kb-radius-md: 0.5rem; /* 8px */
+	--kb-radius-lg: 0.75rem; /* 12px */
+
+	/* Typography */
+	--kb-font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+		sans-serif;
+	--kb-font-size: 14px;
+	--kb-font-size-sm: 12px;
+	--kb-font-weight-semibold: 600;
+
+	/* Layout */
+	--kb-col-min-width: 20rem; /* column min width */
+	--kb-board-gap: var(--kb-space-md);
+	--kb-col-gap: var(--kb-space-sm);
+	--kb-card-gap: var(--kb-space-xs);
+
+	/* Focus ring */
+	--kb-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.35); /* primary w/ opacity */
+
+	/* Scrollbar (light) */
+	--kb-scrollbar-bg: #f3f4f6; /* gray-100 */
+	--kb-scrollbar-thumb: #d1d5db; /* gray-300 */
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+	--kb-bg: #0b0f14; /* very dark */
+	--kb-fg: #e5e7eb; /* gray-200 */
+	--kb-muted-fg: #9ca3af; /* gray-400 */
+	--kb-border: #1f2937; /* gray-800 */
+
+	--kb-surface: #111827; /* gray-900 */
+	--kb-surface-2: #0f172a; /* slate-950-ish */
+	--kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+	--kb-shadow-md: 0 6px 14px rgba(0, 0, 0, 0.5);
+
+	--kb-primary: #3b82f6; /* blue-500 */
+	--kb-success: #22c55e; /* green-500 */
+	--kb-warning: #f59e0b; /* amber-500 */
+	--kb-danger: #ef4444; /* red-500 */
+	--kb-info: #38bdf8; /* sky-400 */
+
+	--kb-scrollbar-bg: #111827; /* gray-900 */
+	--kb-scrollbar-thumb: #374151; /* gray-700 */
+}
+
+/* ---------------------------------------------------------
+   2) GENERIC RESETS (component scope)
+   --------------------------------------------------------- */
+
+.kb-board,
+.kb-column,
+.kb-card,
+.kb-badge,
+.kb-avatar,
+.kb-ghost,
+.kb-due {
+	box-sizing: border-box;
+	font-family: var(--kb-font-family);
+	color: var(--kb-fg);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	.kb-board *,
+	.kb-column *,
+	.kb-card *,
+	.kb-ghost * {
+		animation: none !important;
+		transition: none !important;
+	}
+}
+
+/* ---------------------------------------------------------
+   3) BOARD LAYOUT
+   --------------------------------------------------------- */
+
+.kb-board {
+	background: var(--kb-bg);
+	padding: var(--kb-space-md);
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+	gap: var(--kb-board-gap);
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+/* Scrollbar styling (WebKit) */
+.kb-board::-webkit-scrollbar {
+	height: 10px;
+}
+.kb-board::-webkit-scrollbar-track {
+	background: var(--kb-scrollbar-bg);
+}
+.kb-board::-webkit-scrollbar-thumb {
+	background: var(--kb-scrollbar-thumb);
+	border-radius: var(--kb-radius-md);
+}
+
+/* ---------------------------------------------------------
+   4) COLUMN
+   --------------------------------------------------------- */
+
+.kb-column {
+	background: var(--kb-surface);
+	border: 1px solid var(--kb-border);
+	border-radius: var(--kb-radius-lg);
+	box-shadow: var(--kb-shadow-sm);
+	padding: var(--kb-space-md);
+	min-width: var(--kb-col-min-width);
+	max-height: 90vh;
+
+	display: flex;
+	flex-direction: column;
+	gap: var(--kb-col-gap);
+
+	/* Focus-visible for keyboard users */
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--kb-focus-ring);
+	}
+
+	/* Visual hint when used as a droppable target (optional) */
+	// &.outline {
+	// 	outline: 2px dashed var(--kb-primary);
+	// 	outline-offset: 2px;
+	// }
+}
+
+.kb-column header {
+	background: var(--kb-surface-2);
+	border: 1px solid var(--kb-border);
+	border-radius: var(--kb-radius-md);
+	padding: var(--kb-space-sm);
+	font-size: var(--kb-font-size);
+	font-weight: var(--kb-font-weight-semibold);
+	color: var(--kb-fg);
+}
+
+/* Column header element when using dedicated class (no descendant selector) */
+.kb-col-header {
+	background: var(--kb-surface-2);
+	border: 1px solid var(--kb-border);
+	border-radius: var(--kb-radius-md);
+	padding: var(--kb-space-sm);
+	font-size: var(--kb-font-size);
+	font-weight: var(--kb-font-weight-semibold);
+	color: var(--kb-fg);
+	margin-bottom: var(--kb-space-md);
+}
+
+/* Column cards container (replaces flex flex-col gap-2) */
+.kb-col-cards {
+	display: flex;
+	flex-direction: column;
+	gap: var(--kb-col-gap);
+}
+
+/* Column body container (optional hook if you need inner scrolling) */
+.kb-column .kb-col-body {
+	display: flex;
+	flex-direction: column;
+	gap: var(--kb-col-gap);
+	overflow-y: auto;
+	overscroll-behavior: contain;
+}
+
+/* ---------------------------------------------------------
+   5) CARD
+   --------------------------------------------------------- */
+
+.kb-card {
+	background: var(--kb-surface);
+	border: 1px solid var(--kb-border);
+	border-radius: var(--kb-radius-md);
+	box-shadow: var(--kb-shadow-sm);
+	padding: var(--kb-space-sm) var(--kb-space-md);
+	display: flex;
+	flex-direction: column;
+	gap: var(--kb-card-gap);
+	font-size: var(--kb-font-size);
+	transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.2s ease;
+	cursor: grab;
+
+	&:hover {
+		background: color-mix(in oklab, var(--kb-surface) 92%, var(--kb-fg) 8%);
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--kb-focus-ring);
+	}
+
+	&.is-dragging {
+		opacity: 0.9;
+		cursor: grabbing;
+		transform: scale(0.98) rotate(2deg);
+		box-shadow: var(--kb-shadow-md);
+	}
+}
+
+.kb-ghost {
+	border-style: dashed;
+	background: transparent;
+	height: 60px; /* visually similar to a small card */
+	margin: 0 0 var(--kb-card-gap) 0;
+	opacity: 0.6;
+}
+
+/* Optional title/desc hooks (use these classNames in your TSX if desired) */
+.kb-card-title {
+	font-weight: var(--kb-font-weight-semibold);
+	line-height: 1.25;
+}
+.kb-card-desc {
+	color: var(--kb-muted-fg);
+	font-size: var(--kb-font-size-sm);
+	line-height: 1.35;
+}
+
+/* Card header horizontal row (replaces flex items-center gap-2) */
+.kb-card-header-row {
+	display: flex;
+	align-items: center;
+	gap: var(--kb-space-sm);
+}
+
+/* Card meta row (replaces mt-2 flex flex-wrap items-center gap-2) */
+.kb-card-meta-row {
+	margin-top: var(--kb-space-sm);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--kb-space-sm);
+}
+
+/* ---------------------------------------------------------
+   6) BADGE
+   --------------------------------------------------------- */
+
+.kb-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--kb-space-2xs);
+	border-radius: 999px;
+	border: 1px solid var(--kb-border);
+	padding: 0 var(--kb-space-xs);
+	height: 1.25rem; /* ~20px */
+	line-height: 1;
+	font-size: var(--kb-font-size-sm);
+	background: var(--kb-surface-2);
+	color: var(--kb-fg);
+	white-space: nowrap;
+	user-select: none;
+}
+
+/* Allow inline color hint via style attribute: background + border + text */
+.kb-badge[data-variant="primary"] {
+	border-color: var(--kb-primary);
+	color: var(--kb-primary);
+	background: color-mix(in oklab, var(--kb-primary) 12%, transparent);
+}
+.kb-badge[data-variant="success"] {
+	border-color: var(--kb-success);
+	color: var(--kb-success);
+	background: color-mix(in oklab, var(--kb-success) 12%, transparent);
+}
+.kb-badge[data-variant="warning"] {
+	border-color: var(--kb-warning);
+	color: var(--kb-warning);
+	background: color-mix(in oklab, var(--kb-warning) 12%, transparent);
+}
+.kb-badge[data-variant="danger"] {
+	border-color: var(--kb-danger);
+	color: var(--kb-danger);
+	background: color-mix(in oklab, var(--kb-danger) 12%, transparent);
+}
+.kb-badge[data-variant="info"] {
+	border-color: var(--kb-info);
+	color: var(--kb-info);
+	background: color-mix(in oklab, var(--kb-info) 12%, transparent);
+}
+
+/* ---------------------------------------------------------
+   7) AVATAR
+   --------------------------------------------------------- */
+
+.kb-avatar {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	border: 1px solid var(--kb-border);
+	object-fit: cover;
+	background: var(--kb-surface-2);
+	user-select: none;
+}
+
+/* ---------------------------------------------------------
+   8) DUE DATE PILL
+   --------------------------------------------------------- */
+
+.kb-due {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--kb-space-2xs);
+	font-size: var(--kb-font-size-sm);
+	border-radius: var(--kb-radius-sm);
+	border: 1px solid var(--kb-border);
+	padding: 0 var(--kb-space-xs);
+	height: 1.25rem;
+	color: var(--kb-muted-fg);
+	background: var(--kb-surface-2);
+	user-select: none;
+}
+.kb-due.overdue {
+	border-color: var(--kb-danger);
+	color: var(--kb-danger);
+	background: color-mix(in oklab, var(--kb-danger) 12%, transparent);
+}
+
+/* ---------------------------------------------------------
+   9) UTILS (optional)
+   --------------------------------------------------------- */
+
+/* Hide overflow text nicely */
+.kb-truncate {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Small flex row utility for inline meta rows */
+.kb-row {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--kb-space-xs);
+}
+
+/* Simple visually-hidden helper for a11y-only text */
+.kb-sr-only {
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   10) RESPONSIVE TWEAKS
+   --------------------------------------------------------- */
+
+@media (max-width: 768px) {
+	:root {
+		--kb-col-min-width: 16rem;
+	}
+	.kb-board {
+		padding: var(--kb-space-sm);
+		gap: var(--kb-space-sm);
+	}
+	.kb-column {
+		padding: var(--kb-space-sm);
+	}
+}
+
+/* ---------------------------------------------------------
+   11) OPTIONAL ANIMATION TOKENS
+   --------------------------------------------------------- */
+
+/* Subtle appear animation for cards (can be added as a class if needed) */
+@keyframes kb-fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+.kb-anim-in {
+	animation: kb-fade-in-up 160ms ease-out both;
+}

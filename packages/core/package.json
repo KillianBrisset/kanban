@@ -1,0 +1,41 @@
+{
+	"name": "@killianbrisset/kanban-core",
+	"version": "0.1.0",
+	"license": "MIT",
+	"type": "module",
+	"sideEffects": false,
+	"files": [
+		"dist",
+		"LICENSE"
+	],
+	"main": "dist/index.cjs",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"scripts": {
+		"build": "tsup src/index.ts --dts --format cjs,esm"
+	},
+	"devDependencies": {
+		"tsup": "^8.5.0",
+		"typescript": "^5.9.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/killianbrisset/kanban.git",
+		"directory": "packages/core"
+	},
+	"author": "Killian Brisset",
+	"bugs": {
+		"url": "https://github.com/killianbrisset/kanban/issues"
+	},
+	"homepage": "https://github.com/killianbrisset/kanban#readme"
+}
