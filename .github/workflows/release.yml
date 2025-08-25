@@ -10,10 +10,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Setup Node
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: "pnpm"
-      - run: corepack enable && corepack prepare pnpm@latest --activate
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm -w build
+
+      # 👇 Install pnpm (stable version)
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: true # Automatically run `pnpm install`
+
+      # Build / test
+      - run: pnpm build
+      - run: pnpm test
