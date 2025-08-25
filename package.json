@@ -7,6 +7,7 @@
 		"lint": "eslint . --ext .ts,.tsx || true",
 		"test": "vitest run",
 		"changeset": "changeset",
+		"version-packages": "changeset version",
 		"release": "pnpm -w build && changeset publish",
 		"sync:license": "cp LICENSE packages/core/LICENSE && cp LICENSE packages/react/LICENSE"
 	},
